@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+.button-container {
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  height: 100vh;
+  background-color: #f0f0f0;
+  padding: 16px;
+}
+.menu-button {
+display: flex;
+justify-content: center;
+align-items: center;
+border-radius: 50%;
+width: 96px;
+height: 96px;
+margin-bottom: 16px;
+background-image: radial-gradient(circle at 50% 60%, #f5f5f5, #e0e0e0);
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+transition: all 0.3s;
+}
+
+.menu-button:hover {
+background-image: radial-gradient(circle at 50% 50%, #f5f5f5, #e0e0e0);
+box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+transform: translateY(-2px);
+}
+
+.working-area {
+position: absolute;
+left: 100px;
+right: 0;
+top: 0;
+bottom: 0;
+overflow-y: auto;
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+grid-gap: 20px;
+padding: 20px;
+grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+
+background: radial-gradient(at right bottom,#159598,transparent 70%);
+bottom: 0;
+background-position: 100% 100%;
+transform-origin: 50% 93%;
+background-size: 100% 200vh;
+background-repeat: no-repeat;
+}
+
+.card {
+background-color: #ffffff;
+border-radius: 5px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1),
+0 0 0 1px rgba(0, 0, 0, 0.1);
+padding: 20px;
+display: flex;
+flex-direction: column;
+transition: all 0.3s;
+height: calc(100vh / 5 - 20px); /* Assuming 3 rows */
+
+}
+
+.card:hover {
+background-color: #f5f5f5;
+box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2),
+0 0 0 1px rgba(0, 0, 0, 0.1);
+transform: translateY(-2px);
+}
+.card h3 {
+margin: 0;
+padding: 0;
+background: -webkit-linear-gradient(#19aba7,#326f95,#332756);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+font-size: 18px;
+
+font-family: "Source Sans Pro",sans-serif;
+font-weight: 700;
+margin-top: 0;
+padding-top: .5em;
+margin-bottom: .3em;
+}
+p {
+    font-size: 14px;
+    margin-bottom: 0;
+  }
+.emoji-container {
+position: absolute;
+top: 10px;
+right: 10px;
+display: flex;
+flex-direction: row;
+justify-content: flex-end;
+}
+
+.emoji, .arrow {
+margin-left: 8px;
+font-size: 16px;
+
+}
+
+.stars-container{
+display: flex;
+justify-content: flex-start;
+margin-bottom: 10px;
+}
+
+.star {
+color: #ccc;
+}
+
+.star-filled {
+color: #f1c40f;
+}
+
+.card-inner {
+position: relative;
+}
+
+.chat-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.chat-window {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.1);
+  width: 50%;
+  max-width: 600px;
+}
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #159598;
+  border-radius: 10px 10px 0 0;
+  padding: 10px;
+  color: white;
+  font-weight: bold;
+}
+
+.messages-container {
+  height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  margin: 10px 0;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.message.sent {
+  justify-content: flex-end;
+}
+
+.message.received {
+  justify-content: flex-start;
+}
+
+.text {
+  padding: 10px;
+  border-radius: 5px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+.text.sent {
+  background-color: #159598;
+  color: white;
+}
+
+.text.received {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.time {
+  font-size: 10px;
+  color: #999;
+  margin-left: 5px;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+}
+
+.input-field {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  outline: none;
+}
+
+.send-button {
+  width: 40px;
+  height: 40px;
+  background-color: #159598;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  margin-left: 10px;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.send-button:hover {
+  background-color: #128a87;
+}
+
+.loading-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+
+ </style>
+</head>
+<body>
+  <div class="button-container">
+    <button id="login" class="menu-button cls-2">🏠<br />Вход</button>
+    <button id="high_priority" class="menu-button cls-6">🟥<br />Высокий приоритет</button>
+    <button id="medium_priority" class="menu-button cls-7">🟨<br />Средний приоритет</button>
+    <button id="low_priority" class="menu-button cls-5">🟩<br />Низкий приоритет</button>
+    <button id="pending" class="menu-button cls-8">💤<br />В ожидании</button>
+    <button id="stars" class="menu-button cls-10">🌟<br />Отзывы</button>
+    <button id="search" class="menu-button cls-9">🔍<br />Поиск</button>
+  </div>
+  <div class="working-area">
+
+    <div class="card" onclick="showChat()">
+      <div class="card-inner">
+        <div class="emoji-container">
+          <span class="emoji emoji-yellow">💤</span>
+          <span class="emoji emoji-red">🔴</span>
+          <span class="emoji emoji-green">🟢</span>
+          <span class="emoji emoji-yellow">🟡</span>
+          <span class="arrow arrow-up">⬆️</span>
+          <span class="arrow arrow-down">⬇️</span>
+        </div>
+        <div class="stars-container">
+          <span class="star star-filled">⭐</span>
+          <span class="star">⭐</span>
+          <span class="star">⭐</span>
+          <span class="star">⭐</span>
+          <span class="star">⭐</span>
+        </div>
+        <h3>Вынести мусор</h3>
+        <p>После ремонта остался строительный мусор.</p>
+      </div>
+    </div>
+
+    <div class="card" onclick="showChat1()">
+      <div class="card-inner">
+        <div class="emoji-container">
+          <span class="emoji emoji-yellow">💤</span>
+          <span class="emoji emoji-red">🔴</span>
+          <span class="emoji emoji-green">🟢</span>
+          <span class="emoji emoji-yellow">🟡</span>
+          <span class="arrow arrow-up">⬆️</span>
+          <span class="arrow arrow-down">⬇️</span>
+        </div>
+        <div class="stars-container">
+          <span class="star star-filled">⭐</span>
+          <span class="star">⭐</span>
+          <span class="star">⭐</span>
+          <span class="star">⭐</span>
+          <span class="star">⭐</span>
+        </div>
+        <h3>Достать звезду с неба</h3>
+        <p>Оплату гарантирую.</p>
+      </div>
+    </div>
+
+
+  </div>
+  <div class="container chat-container">
+    <div class="chat-window">
+      <div class="loading-indicator" style="display: none;">
+        <img src="https://i.pinimg.com/originals/46/18/55/461855b29ae2060f319f225529145f7c.gif" alt="Loading..." style="height: 20px;" />
+        
+      </div>
+      
+    <div class="chat">
+      <div class="chat-header">
+        <div class="chat-header-title">Чат поддержки</div>
+      </div>
+      <div class="messages-container">
+        <!-- Сообщения будут добавляться сюда динамически -->
+      </div>
+      <div id="loading-indicator" class="message received" style="display: none;">
+        <div class="text">
+          <span class="loading-dots">⏳</span> Ожидание ответа...
+        </div>
+      </div>
+      <div class="input-container">
+        <input type="text" class="input-field" placeholder="Введите ваше сообщение..." onkeydown="handleInput(event)">
+        <div class="send-button" onclick="sendMessage()"></div>
+      </div>
+    </div>
+    </div>
+  </div>
+  <script>
+    const messagesContainer = document.querySelector(".messages-container");
+    const inputField = document.querySelector(".input-field");
+    inputField.addEventListener("keydown", handleInput);
+    
+    function formatTime(date) {
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+      return `${hours}:${minutes}`;
+    }
+    
+    function createMessage(content, type) {
+  const message = document.createElement("div");
+  message.classList.add("message", type);
+
+  const time = document.createElement("span");
+  time.classList.add("time");
+  time.textContent = formatTime(new Date());
+
+  const text = document.createElement("span");
+  text.classList.add("text");
+  text.textContent = content;
+
+  message.appendChild(time);
+  message.appendChild(text);
+
+  setTimeout(() => {
+    message.classList.remove('hidden');
+  }, 50);
+
+  return message;
+}
+
+
+    
+    function handleInput(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    const inputField = document.querySelector(".input-field");
+    sendMessage(inputField.value);
+    inputField.value = ""; // очистка поля ввода
+  }
+}
+
+
+async function getResponseFromOpenAI(prompt) {
+  const apiKey = "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"; 
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 1,
+      }),
+    });
+
+    const data = await response.json();
+    const generatedText = data.choices[0].message.content;
+    return generatedText;
+  } catch (error) {
+    console.error("Error while fetching response from OpenAI:", error);
+    return "Error: Failed to get a response from the server.";
+  }
+}
+
+
+
+async function sendMessage() {
+  const inputField = document.querySelector(".input-field");
+  const messagesContainer = document.querySelector(".messages-container");
+  const loadingIndicator = document.querySelector(".loading-indicator");
+
+  // Создание и добавление сообщения, отправленного пользователем
+  const userMessage = createMessage(inputField.value, "sent");
+  messagesContainer.appendChild(userMessage);
+
+  // Показываем индикатор загрузки
+  loadingIndicator.style.display = "block";
+
+  // Получение ответа от модели GPT-3
+  const receivedText = await getResponseFromOpenAI(inputField.value); // передаем текст сообщения в параметре prompt
+  console.log('Полученный текст:', receivedText);
+
+  // Скрываем индикатор загрузки
+  loadingIndicator.style.display = "none";
+
+  // Проверяем, является ли ответ пустым
+  const receivedMessage = receivedText ? createMessage(receivedText, "received") : createMessage("Сервер вернул пустой ответ", "received");
+
+  messagesContainer.appendChild(receivedMessage);
+
+  // Очистка поля ввода и автоматическая прокрутка вниз, чтобы показать последнее сообщение
+  inputField.value = "";
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+
+function showChat() {
+  var chatElement = document.getElementsByClassName("chat-container")[0];
+  chatElement.style.display = "flex";
+
+  chatElement.onclick = function (event) {
+    if (!event.target.closest(".chat-window")) {
+      chatElement.style.display = "none";
+    }
+  };
+}
+
+function showChat1() {
+  var chatElement = document.getElementsByClassName("chat-container")[0];
+  chatElement.style.display = "flex";
+
+  chatElement.onclick = function (event) {
+    if (!event.target.closest(".chat-window")) {
+      chatElement.style.display = "none";
+    }
+  };
+}
+
+    
+function showLoadingIndicator() {
+  const loadingIndicator = document.getElementById("loading-indicator");
+  loadingIndicator.style.display = "flex";
+}
+
+function hideLoadingIndicator() {
+  const loadingIndicator = document.getElementById("loading-indicator");
+  loadingIndicator.style.display = "none";
+}
+    </script>
+    
+</body>
+</html>
